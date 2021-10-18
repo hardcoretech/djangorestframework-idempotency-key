@@ -1,7 +1,7 @@
 import hashlib
 import json
 import traceback
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, Tuple
 
 from django.conf import settings
@@ -16,7 +16,7 @@ from .models import (
     IdempotencyKey,
     RecoveryPoint,
 )
-from .utils import local_now, raise_if
+from .utils import raise_if
 
 
 class IdempotencyKeyMiddleware:
@@ -86,7 +86,7 @@ class IdempotencyKeyMiddleware:
                 'request_path': request.path_info,
                 'request_digest': digest,
                 'recovery_point': IDEMPOTENCY_RECOVERY_POINT_STARTED,
-                'locked_at': local_now(),
+                'locked_at': datetime.utcnow(),
             },
         )
 
@@ -101,7 +101,9 @@ class IdempotencyKeyMiddleware:
 
             # Only acquire a lock if the key is unlocked or its lock has expired
             # because the original request was long enough ago.
-            if obj.locked_at and obj.locked_at > local_now() - timedelta(seconds=settings.IDEMPOTENCY_KEY_LOCK_TIMEOUT):
+            if obj.locked_at and obj.locked_at > datetime.utcnow() - timedelta(
+                seconds=settings.IDEMPOTENCY_KEY_LOCK_TIMEOUT
+            ):
                 raise self.Http409Error(
                     'Request in progress, please try again later.',
                 )
@@ -109,7 +111,7 @@ class IdempotencyKeyMiddleware:
             # Lock the key and update latest run unless the request is already
             # finished
             if obj.recovery_point != IDEMPOTENCY_RECOVERY_POINT_FINISHED:
-                obj.locked_at = local_now()
+                obj.locked_at = datetime.utcnow()
                 obj.save(update_fields=['last_run_at', 'locked_at'])
 
         return obj
