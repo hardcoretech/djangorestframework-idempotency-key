@@ -1,11 +1,12 @@
 import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any, Callable, Dict, Tuple
 
 from django.conf import settings
 from django.db import transaction
 from django.http import JsonResponse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.utils.encoders import JSONEncoder
 
@@ -81,7 +82,7 @@ class IdempotencyKeyMiddleware:
                 'request_path': request.path_info,
                 'request_digest': digest,
                 'recovery_point': IDEMPOTENCY_RECOVERY_POINT_STARTED,
-                'locked_at': datetime.utcnow(),
+                'locked_at': timezone.now(),
             },
         )
 
@@ -96,7 +97,7 @@ class IdempotencyKeyMiddleware:
 
             # Only acquire a lock if the key is unlocked or its lock has expired
             # because the original request was long enough ago.
-            if obj.locked_at and obj.locked_at > datetime.utcnow() - timedelta(
+            if obj.locked_at and obj.locked_at > timezone.now() - timedelta(
                 seconds=settings.IDEMPOTENCY_KEY_LOCK_TIMEOUT
             ):
                 raise self.Http409Error(
@@ -106,7 +107,7 @@ class IdempotencyKeyMiddleware:
             # Lock the key and update latest run unless the request is already
             # finished
             if obj.recovery_point != IDEMPOTENCY_RECOVERY_POINT_FINISHED:
-                obj.locked_at = datetime.utcnow()
+                obj.locked_at = timezone.now()
                 obj.save(update_fields=['last_run_at', 'locked_at'])
 
         return obj
