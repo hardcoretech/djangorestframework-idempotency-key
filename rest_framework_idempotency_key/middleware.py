@@ -1,6 +1,5 @@
 import hashlib
 import json
-import traceback
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, Tuple
 
@@ -33,7 +32,6 @@ class IdempotencyKeyMiddleware:
         try:
             request.idempotency_key = self._prepare_idempotency_key(request)
         except self.Http409Error as exc:
-            print(f'IdempotencyKeyMiddleware.Http409Error: {exc.message}, {traceback.format_exc()}')
             return JsonResponse({'message': exc.message}, status=status.HTTP_409_CONFLICT)
 
         try:
@@ -72,10 +70,7 @@ class IdempotencyKeyMiddleware:
             request.path_info.encode('utf8'),
         )
 
-        if settings.IS_TEST:
-            user = getattr(request, '_force_auth_user', None)
-        else:
-            user = request.user
+        user = request.user
 
         obj, created = IdempotencyKey.objects.get_or_create(
             idempotency_key=idempotency_key,
@@ -133,8 +128,6 @@ class IdempotencyKeyMiddleware:
     @staticmethod
     def proceed(idempotency_key: IdempotencyKey, recovery_point_to_action_map: TRecoveryPointToActionMap):
         raise_if(idempotency_key is None, AssertionError('Parameter idempotency_key cannot be None'))
-        # TODO: Check the following condition
-        # assert idempotency_key.user is None or idempotency_key.user == get_current_user()
 
         response_code, response_body, recovery_point = (
             idempotency_key.response_code,
@@ -148,7 +141,6 @@ class IdempotencyKeyMiddleware:
 
                 if recovery_point == IDEMPOTENCY_RECOVERY_POINT_FINISHED:
                     idempotency_key.response_code = response_code
-                    # TODO: use DRF's JSONEncoder in lib.util.
                     idempotency_key.response_body = json.dumps(
                         response_body, ensure_ascii=False, indent=None, separators=(',', ':'), cls=JSONEncoder
                     )
