@@ -25,7 +25,8 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_data={'rest_framework_idempotency_key': ['*', '*/*']},
+    packages=['rest_framework_idempotency_key'],
+    package_dir={'rest_framework_idempotency_key': 'rest_framework_idempotency_key'},
     install_requires=[
         'django',
         'djangorestframework',
