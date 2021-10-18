@@ -19,7 +19,7 @@ setuptools.setup(
     description="Idempotency key app & middleware for Django Rest Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/hardcoretech/idempotency-key",
+    url="https://github.com/hardcoretech/djangorestframework-idempotency-key",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
