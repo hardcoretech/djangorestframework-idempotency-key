@@ -19,6 +19,10 @@ from .models import (
 from .utils import raise_if
 
 
+def get_current_user(request):
+    return request.user
+
+
 class IdempotencyKeyMiddleware:
     EXEMPT_STATUS_LIST = (status.HTTP_400_BAD_REQUEST,)
 
@@ -71,7 +75,7 @@ class IdempotencyKeyMiddleware:
             request.path_info.encode('utf8'),
         )
 
-        user = request.user
+        user = get_current_user(request)
 
         obj, created = IdempotencyKey.objects.get_or_create(
             idempotency_key=idempotency_key,
