@@ -1,7 +1,7 @@
 import hashlib
 import json
 from datetime import timedelta
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from django.conf import settings
 from django.db import transaction
@@ -19,8 +19,10 @@ from .models import (
 from .utils import raise_if
 
 
-def get_current_user(request):
-    return request.user
+def get_current_user(request) -> Optional[settings.AUTH_USER_MODEL]:
+    if request.user:
+        return None if request.user.is_anonymous else request.user
+    return None
 
 
 class IdempotencyKeyMiddleware:
@@ -46,7 +48,8 @@ class IdempotencyKeyMiddleware:
 
         # check this after `get_response`, so that `request` has been handled by DRF
         raise_if(
-            request.idempotency_key is not None and request.user != request.idempotency_key.user,
+            request.idempotency_key is not None
+            and (request.idempotency_key.user and request.user != request.idempotency_key.user),
             AssertionError('Request user must be the same as the one embedded in idempotency key'),
         )
 
