@@ -20,6 +20,8 @@ from .utils import raise_if
 
 
 def get_current_user(request) -> Optional[settings.AUTH_USER_MODEL]:
+    if getattr(settings, 'IDEMPOTENCY_KEY_IGNORE_USER_FIELD', False):
+        return None
     if request.user:
         return None if request.user.is_anonymous else request.user
     return None
@@ -49,7 +51,7 @@ class IdempotencyKeyMiddleware:
         # check this after `get_response`, so that `request` has been handled by DRF
         raise_if(
             request.idempotency_key is not None
-            and (request.idempotency_key.user and request.user != request.idempotency_key.user),
+            and (request.idempotency_key.user and get_current_user(request) != request.idempotency_key.user),
             AssertionError('Request user must be the same as the one embedded in idempotency key'),
         )
 
