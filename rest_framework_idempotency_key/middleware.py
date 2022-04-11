@@ -1,7 +1,7 @@
 import hashlib
 import json
 from datetime import timedelta
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Tuple
 
 from django.conf import settings
 from django.db import transaction
@@ -17,14 +17,6 @@ from .models import (
     RecoveryPoint,
 )
 from .utils import raise_if
-
-
-def get_current_user(request) -> Optional[settings.AUTH_USER_MODEL]:
-    if getattr(settings, 'IDEMPOTENCY_KEY_IGNORE_USER_FIELD', False):
-        return None
-    if request.user:
-        return None if request.user.is_anonymous else request.user
-    return None
 
 
 class IdempotencyKeyMiddleware:
@@ -47,13 +39,6 @@ class IdempotencyKeyMiddleware:
             response = self.get_response(request)
         finally:
             self._reset_lock(request)
-
-        # check this after `get_response`, so that `request` has been handled by DRF
-        raise_if(
-            request.idempotency_key is not None
-            and (request.idempotency_key.user and get_current_user(request) != request.idempotency_key.user),
-            AssertionError('Request user must be the same as the one embedded in idempotency key'),
-        )
 
         return response
 
@@ -80,11 +65,9 @@ class IdempotencyKeyMiddleware:
             request.path_info.encode('utf8'),
         )
 
-        user = get_current_user(request)
-
         obj, created = IdempotencyKey.objects.get_or_create(
             idempotency_key=idempotency_key,
-            user=user,
+            user=None,
             defaults={
                 'request_method': request.method,
                 'request_params': request.body,
