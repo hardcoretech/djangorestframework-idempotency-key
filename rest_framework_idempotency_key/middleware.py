@@ -67,7 +67,6 @@ class IdempotencyKeyMiddleware:
 
         obj, created = IdempotencyKey.objects.get_or_create(
             idempotency_key=idempotency_key,
-            user=None,
             defaults={
                 'request_method': request.method,
                 'request_params': request.body,

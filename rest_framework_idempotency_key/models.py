@@ -21,7 +21,6 @@ class RecoveryPoint(models.TextChoices):
 class IdempotencyKey(models.Model):
     id = models.AutoField(primary_key=True)
     idempotency_key = models.UUIDField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.DO_NOTHING)
 
     created_at = models.DateTimeField(auto_now_add=True)
     last_run_at = models.DateTimeField(auto_now=True)
@@ -45,6 +44,6 @@ class IdempotencyKey(models.Model):
         db_table = 'idempotency_key'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'idempotency_key'], name='Unique IdempotencyKey (user, idempotency_key)'
+                fields=['idempotency_key'], name='Unique IdempotencyKey (idempotency_key)'
             )
         ]
