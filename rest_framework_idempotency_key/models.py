@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 
 # Please read https://brandur.org/idempotency-keys for more detail.
@@ -43,7 +42,5 @@ class IdempotencyKey(models.Model):
     class Meta:
         db_table = 'idempotency_key'
         constraints = [
-            models.UniqueConstraint(
-                fields=['idempotency_key'], name='Unique IdempotencyKey (idempotency_key)'
-            )
+            models.UniqueConstraint(fields=['idempotency_key'], name='Unique IdempotencyKey (idempotency_key)')
         ]

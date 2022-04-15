@@ -20,6 +20,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='idempotencykey',
-            constraint=models.UniqueConstraint(fields=('idempotency_key',), name='Unique IdempotencyKey (idempotency_key)'),
+            constraint=models.UniqueConstraint(
+                fields=('idempotency_key',), name='Unique IdempotencyKey (idempotency_key)'
+            ),
         ),
     ]
