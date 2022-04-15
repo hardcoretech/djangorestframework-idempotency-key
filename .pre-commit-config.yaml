@@ -2,7 +2,7 @@ default_stages: [commit, push]
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.2.0
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
@@ -15,15 +15,15 @@ repos:
           - --remove-unused-variables
           - --remove-all-unused-imports
   - repo: https://github.com/pycqa/isort
-    rev: 5.7.0
+    rev: 5.10.1
     hooks:
       - id: isort
   - repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 22.3.0
     hooks:
       - id: black
         language_version: python3 # Should be a command that runs python3.6+
   - repo: https://gitlab.com/pycqa/flake8
-    rev: '3.9.0'
+    rev: '3.9.2'
     hooks:
       - id: flake8
