@@ -35,4 +35,7 @@ setuptools.setup(
         'data-spec-validator>=1.2.0',
     ],
     python_requires='>=3.6',
+    project_urls={
+        "Changelog": "https://github.com/hardcoretech/djangorestframework-idempotency-key/blob/main/CHANGELOG.md"
+    },
 )
