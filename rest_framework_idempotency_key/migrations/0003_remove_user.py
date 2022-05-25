@@ -10,13 +10,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveConstraint(
-            model_name='idempotencykey',
-            name='Unique IdempotencyKey (user, idempotency_key)',
-        ),
         migrations.RemoveField(
             model_name='idempotencykey',
             name='user',
+        ),
+        migrations.RemoveConstraint(
+            model_name='idempotencykey',
+            name='Unique IdempotencyKey (user, idempotency_key)',
         ),
         migrations.AddConstraint(
             model_name='idempotencykey',
