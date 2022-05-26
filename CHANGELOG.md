@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0.2
+-----
+
+Fixes:
+
+- Missing LICENSE file in package (Upgrade setuptools)
+
+
 1.0.1
 -----
 
