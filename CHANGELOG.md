@@ -1,6 +1,15 @@
 Changelog
 =========
 
+1.0.3
+-----
+
+Fixes:
+
+- Fail to run migration script for django 4
+- Fail to run migration script when duplicated idempotency_key exists
+
+
 1.0.2
 -----
 

@@ -3,6 +3,16 @@
 from django.db import migrations, models
 
 
+def remove_duplicated_records(apps, schema_editor):
+    IdempotencyKey = apps.get_model('rest_framework_idempotency_key', 'IdempotencyKey')
+    existed_keys = set()
+    for id_key in IdempotencyKey.objects.all():
+        if id_key.idempotency_key in existed_keys:
+            id_key.delete()
+        else:
+            existed_keys.add(id_key.idempotency_key)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,13 +20,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
+        migrations.RunPython(remove_duplicated_records, migrations.RunPython.noop),
+        migrations.AlterField(
             model_name='idempotencykey',
             name='user',
+            field=models.IntegerField(null=True),
         ),
         migrations.RemoveConstraint(
             model_name='idempotencykey',
             name='Unique IdempotencyKey (user, idempotency_key)',
+        ),
+        migrations.RemoveField(
+            model_name='idempotencykey',
+            name='user',
         ),
         migrations.AddConstraint(
             model_name='idempotencykey',
