@@ -1,7 +1,7 @@
 Django
 djangorestframework
 data-spec-validator>=1.2.0
-pre-commit==2.9.2
+pre-commit==2.21.0
 autoflake==1.4
 isort==5.10.1
 black==26.3.1
